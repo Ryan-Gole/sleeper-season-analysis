@@ -45,3 +45,5 @@ web/.DS_Store
 # System
 .DS_Store
 Thumbs.db
+
+stats_cache/*

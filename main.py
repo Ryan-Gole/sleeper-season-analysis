@@ -1,20 +1,27 @@
 import pandas as pd
 from tabulate import tabulate
-from sleeper_stats import build_team_lookup, get_all_team_matchups, get_season_stats_by_team
-from stat_outputs import generate_matchup_tables, generate_summary_tables, inject_tables
+from sleeper_stats import build_team_lookup, get_all_team_matchups, get_season_stats_by_team, get_roster_stats, enrich_starter_stats, get_player_map
+from stat_outputs import generate_matchup_tables, generate_summary_tables, inject_overview_tables, inject_starter_tables
 
-LEAGUE_ID = "1127468541545930752"
+LEAGUE_ID = "1225658606028865536"
+YEAR = 2025
 WEEKS = 14
+HTML_PATH = "web/index.html"
 
 def main():
     print("Fetching team data...")
     team_map = build_team_lookup(LEAGUE_ID)
     matchups_by_team = get_all_team_matchups(LEAGUE_ID, team_map, WEEKS)
     season_stats = get_season_stats_by_team(matchups_by_team)
-
+    
     html = [generate_matchup_tables(matchups_by_team)]
     html.append(generate_summary_tables(season_stats))
-    inject_tables("web/index.html", '\n'.join(html))
+    inject_overview_tables(HTML_PATH, '\n'.join(html))
+
+    starter_stats = get_roster_stats(LEAGUE_ID, team_map, WEEKS, YEAR)
+    player_map = get_player_map()
+    enriched = enrich_starter_stats(starter_stats, player_map)
+    inject_starter_tables(HTML_PATH, enriched)
 
 
     # df_stats = pd.DataFrame(season_stats).T

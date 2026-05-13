@@ -1,5 +1,7 @@
 import requests
 import pandas as pd
+import os
+import json
 
 # ----- Fetch Functions -----
 def get_users(league_id):
@@ -13,6 +15,34 @@ def get_rosters(league_id):
 def get_matchups(league_id, week):
     url = f"https://api.sleeper.app/v1/league/{league_id}/matchups/{week}"
     return requests.get(url).json()
+
+# ----- Player Data -----
+PLAYER_CACHE_PATH = "stats_cache/player_cache.json"
+STATS_CACHE_PATH = "stats_cache/{year}_{week}.json"
+
+def get_player_map(force_refresh=False):
+    if not force_refresh and os.path.exists(PLAYER_CACHE_PATH):
+        with open(PLAYER_CACHE_PATH, 'r') as f:
+            return json.load(f)
+    
+    url = "https://api.sleeper.app/v1/players/nfl"
+    data = requests.get(url).json()
+    with open(PLAYER_CACHE_PATH, 'w') as f:
+        json.dump(data, f)
+    return data
+
+
+def get_weekly_player_stats(year, week, force_refresh=False):
+    file_path = STATS_CACHE_PATH.format(year=year, week=week)
+    if not force_refresh and os.path.exists(file_path):
+        with open(file_path, 'r') as f:
+            return json.load(f)
+        
+    url = f"https://api.sleeper.app/v1/stats/nfl/regular/{year}/{week}"
+    data = requests.get(url).json()
+    with open(file_path, 'w') as f:
+        json.dump(data, f)
+    return data
 
 # ----- Analysis -----
 def build_team_lookup(league_id):
@@ -47,12 +77,14 @@ def get_all_team_matchups(league_id, team_map, weeks):
                     "opp": team2,
                     "points_for": pts1,
                     "points_against": pts2,
+                    "margin": pts1 - pts2,
                     "result": 'W' if pts1 > pts2 else 'L' if pts1 < pts2 else 'D'
                 }
                 matchups_by_team[team2][week-1] = {
                     "opp": team1,
                     "points_for": pts2,
                     "points_against": pts1,
+                    "margin": pts2 - pts1,
                     "result": 'W' if pts2 > pts1 else 'L' if pts2 < pts1 else 'D'
                 }
             else:
@@ -61,9 +93,85 @@ def get_all_team_matchups(league_id, team_map, weeks):
                         "opp": None,
                         "points_for": 0,
                         "points_against": 0,
+                        "margin": 0,
                         "result": None
                     }
     return matchups_by_team
+
+
+def get_roster_stats(league_id, team_map, weeks, year):
+    roster_stats_by_team = { 
+        team: { 
+            "players" : [],
+            "starts" : {},
+            "appearances" : {},
+            "start_points": {},
+            "total_points": {}
+            } 
+        for team in team_map.values() 
+    }
+    for week in range(1, weeks + 1):
+        matchups = get_matchups(league_id, week)
+        weekly_stats = get_weekly_player_stats(year, week)
+
+        for team in matchups:
+            team_id = team_map.get(team['roster_id'], f"T{team['roster_id']}")
+            team_stats = roster_stats_by_team[team_id]
+
+            starters = team.get('starters', [])
+            players_points = team.get('players_points', {})
+
+            for player_id, points in players_points.items():
+                if player_id not in team_stats["players"]:
+                    team_stats["players"].append(player_id)
+
+                player_week_stats = weekly_stats.get(player_id, {})
+                player_played = player_week_stats.get("gp", 0) > 0
+                if player_played:
+                    team_stats["appearances"][player_id] = team_stats["appearances"].get(player_id, 0) + 1
+                    team_stats["total_points"][player_id] = team_stats["total_points"].get(player_id, 0) + points
+
+                if player_id in starters:
+                    team_stats["starts"][player_id] = team_stats["starts"].get(player_id, 0) + 1
+                    team_stats["start_points"][player_id] = team_stats["start_points"].get(player_id, 0) + points
+                
+    
+    return roster_stats_by_team
+
+def enrich_starter_stats(starters_by_team, player_map):
+    enriched = {}
+    for team, stats in starters_by_team.items():
+        players = []
+        for player_id in stats["players"]:
+            starts = stats["starts"].get(player_id, 0)
+            appearances = stats["appearances"].get(player_id, 0)
+            start_points = stats["start_points"].get(player_id, 0.0)
+            total_points = stats["total_points"].get(player_id, 0.0)
+            info = player_map.get(player_id, {})
+            ppgs =  round(start_points / starts, 2) if starts > 0 else 0.0
+            ppg = round(total_points / appearances, 2) if appearances > 0 else 0.0
+            ppg_diff = round(ppgs - ppg , 2) if starts > 0 else 0.0
+            players.append({
+                "id": player_id,
+                "name": info.get("full_name", f"Player {player_id}"),
+                "position": info.get("position", "?"),
+                "nfl_team": info.get("team", "?"),
+                "age": info.get("age", "?"),
+                "years_exp": info.get("years_exp", "?"),
+                "starts": starts,
+                "games_played": appearances,
+                "start_points": round(start_points, 2),
+                "ppgs": ppgs,
+                "total_points": round(total_points, 2),
+                "ppg": ppg,
+                "ppg_diff": ppg_diff
+            })
+        
+        # Sort by total points descending
+        players.sort(key=lambda p: p["start_points"], reverse=True)
+        enriched[team] = players
+    
+    return enriched
 
 def get_season_stats_by_team(matchups_by_team):
     weeks = len(next(iter(matchups_by_team.values())))

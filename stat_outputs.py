@@ -51,6 +51,26 @@ def generate_matchup_tables(matchups_by_team):
             '-': 'text-gray-400'
         }.get(result, '')
         return f'<td class="border px-2 py-1 {color} {bg}">{result}</td>'
+    
+    def margin_cell(team, week_idx, matchup):
+        margin = matchup.get("margin", 0)
+        opp = matchup.get("opp", "")
+        pair = tuple(sorted((team, opp)))
+        bg = matchup_colors_by_week[week_idx].get(pair, "")
+        if isinstance(margin, (int, float)):
+            if margin > 0:
+                color = 'text-green-400'
+                display = f"+{margin:.2f}"
+            elif margin < 0:
+                color = 'text-red-400'
+                display = f"{margin:.2f}"
+            else:
+                color = 'text-yellow-400'
+                display = "0.00"
+        else:
+            color = 'text-gray-400'
+            display = "-"
+        return f'<td class="border px-2 py-1 {color} {bg}">{display}</td>'
 
     def points_cell(team, week_idx, matchup):
         points = matchup.get("points_for", 0)
@@ -76,7 +96,57 @@ def generate_matchup_tables(matchups_by_team):
     html.append('<p class="text-sm text-gray-400 mb-16">Background colors match teams that played each other that week.</p>')
     html.append(build_table("📈 Weekly Points Scored", points_cell))
     html.append('<p class="text-sm text-gray-400 mb-16">Background colors match teams that played each other that week.</p>')
+    html.append(build_table("📉 Weekly Point Differentials", margin_cell))
+    html.append('<p class="text-sm text-gray-400 mb-16">Positive values indicate a win. Negative values indicate a loss. ' \
+    'Background colors match teams that played each other that week.</p>')
     html.append('</section></div>')
+    return '\n'.join(html)
+
+def generate_team_starter_table(players):
+    html = ['<div class="mt-6 pt-4 border-t border-gray-700">']
+    html.append('<h4 class="text-base font-semibold mb-3 text-gray-300">🏈 Starter Stats</h4>')
+    html.append('<table class="sortable table-auto border-collapse text-sm mb-2 w-full">')
+    html.append('''<thead><tr>
+        <th class="border px-2 py-1 text-left cursor-pointer hover:underline">Player <span class="sort-indicator"></span></th>
+        <th class="border px-2 py-1 cursor-pointer hover:underline">Pos <span class="sort-indicator"></span></th>
+        <th class="border px-2 py-1 cursor-pointer hover:underline">NFL Team <span class="sort-indicator"></span></th>
+        <th class="border px-2 py-1 cursor-pointer hover:underline">Age <span class="sort-indicator"></span></th>
+        <th class="border px-2 py-1 cursor-pointer hover:underline">Exp <span class="sort-indicator"></span></th>
+        <th class="border px-2 py-1 cursor-pointer hover:underline">Starts <span class="sort-indicator"></span></th>
+        <th class="border px-2 py-1 cursor-pointer hover:underline">Games Played <span class="sort-indicator"></span></th>
+        <th class="border px-2 py-1 cursor-pointer hover:underline">Pts in Starts <span class="sort-indicator"></span></th>
+        <th class="border px-2 py-1 cursor-pointer hover:underline">PPG Started <span class="sort-indicator"></span></th>
+        <th class="border px-2 py-1 cursor-pointer hover:underline">Total Pts <span class="sort-indicator"></span></th>
+        <th class="border px-2 py-1 cursor-pointer hover:underline">PPG <span class="sort-indicator"></span></th>
+        <th class="border px-2 py-1 cursor-pointer hover:underline">PPG Diff. When Started <span class="sort-indicator"></span></th>
+    </tr></thead><tbody>''')
+
+    for p in players:
+        img = f'https://sleepercdn.com/content/nfl/players/thumb/{p["id"]}.jpg'
+        exp = "R" if p["years_exp"] == 0 else f'{p["years_exp"]}yr'
+        html.append(f'''<tr>
+            <td class="border px-2 py-1">
+                <div class="flex items-center gap-2">
+                    <img src="{img}" onerror="this.style.display='none'"
+                         class="w-8 h-8 rounded-full object-cover" />
+                    <span>{p["name"]}</span>
+                </div>
+            </td>
+            <td class="border px-2 py-1 text-center">{p["position"]}</td>
+            <td class="border px-2 py-1 text-center">{p["nfl_team"]}</td>
+            <td class="border px-2 py-1 text-center">{p["age"]}</td>
+            <td class="border px-2 py-1 text-center">{exp}</td>
+            <td class="border px-2 py-1 text-center">{p["starts"]}</td>
+            <td class="border px-2 py-1 text-center">{p["games_played"]}</td>
+            <td class="border px-2 py-1 text-center">{p["start_points"]}</td>
+            <td class="border px-2 py-1 text-center">{p["ppgs"]}</td>
+            <td class="border px-2 py-1 text-center">{p["total_points"]}</td>
+            <td class="border px-2 py-1 text-center">{p["ppg"]}</td>
+            <td class="border px-2 py-1 text-center">{p["ppg_diff"]}</td>
+        </tr>''')
+
+    html.append('</tbody></table>')
+    html.append('</div>')
     return '\n'.join(html)
 
 def generate_summary_tables(season_stats_by_team):
@@ -159,7 +229,7 @@ def generate_summary_tables(season_stats_by_team):
     return ''.join(html)
 
 
-def inject_tables(index_path, table_html):
+def inject_overview_tables(index_path, table_html):
     with open(index_path, 'r', encoding='utf-8') as f:
         html = f.read()
 
@@ -177,3 +247,34 @@ def inject_tables(index_path, table_html):
 
     with open(index_path, 'w', encoding='utf-8') as f:
         f.write(new_html)
+
+def inject_starter_tables(index_path, enriched_starters):
+    with open(index_path, 'r', encoding='utf-8') as f:
+        html = f.read()
+
+    for sleeper_username, team_players in enriched_starters.items():
+        start_marker = f"<!-- STARTER_TABLE_START:{sleeper_username} -->"
+        end_marker = f"<!-- STARTER_TABLE_END:{sleeper_username} -->"
+
+        start = html.find(start_marker)
+        end = html.find(end_marker)
+
+        if start == -1 or end == -1:
+            print(f"Warning: markers not found for {sleeper_username}, skipping.")
+            continue
+
+        # enriched_starters is keyed by display_name; match via sleeper_username
+        team_players = enriched_starters.get(sleeper_username)
+        if team_players is None:
+            print(f"Warning: no starter data found for {sleeper_username}, skipping.")
+            continue
+
+        table_html = generate_team_starter_table(team_players)
+        html = (
+            html[:start + len(start_marker)] +
+            "\n" + table_html + "\n" +
+            html[end:]
+        )
+
+    with open(index_path, 'w', encoding='utf-8') as f:
+        f.write(html)
