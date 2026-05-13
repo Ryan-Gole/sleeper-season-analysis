@@ -112,8 +112,8 @@ def generate_team_starter_table(players):
         <th class="border px-2 py-1 cursor-pointer hover:underline">NFL Team <span class="sort-indicator"></span></th>
         <th class="border px-2 py-1 cursor-pointer hover:underline">Age <span class="sort-indicator"></span></th>
         <th class="border px-2 py-1 cursor-pointer hover:underline">Exp <span class="sort-indicator"></span></th>
-        <th class="border px-2 py-1 cursor-pointer hover:underline">Starts <span class="sort-indicator"></span></th>
         <th class="border px-2 py-1 cursor-pointer hover:underline">Games Played <span class="sort-indicator"></span></th>
+        <th class="border px-2 py-1 cursor-pointer hover:underline">Starts <span class="sort-indicator"></span></th>
         <th class="border px-2 py-1 cursor-pointer hover:underline">Pts in Starts <span class="sort-indicator"></span></th>
         <th class="border px-2 py-1 cursor-pointer hover:underline">PPG Started <span class="sort-indicator"></span></th>
         <th class="border px-2 py-1 cursor-pointer hover:underline">Total Pts <span class="sort-indicator"></span></th>
@@ -125,19 +125,19 @@ def generate_team_starter_table(players):
         img = f'https://sleepercdn.com/content/nfl/players/thumb/{p["id"]}.jpg'
         exp = "R" if p["years_exp"] == 0 else f'{p["years_exp"]}yr'
         html.append(f'''<tr>
-            <td class="border px-2 py-1">
-                <div class="flex items-center gap-2">
+            <td class="border px-2 py-1" title="{p["name"]}">
+                <div class="flex items-center gap-2 overflow-hidden">
                     <img src="{img}" onerror="this.style.display='none'"
                          class="w-8 h-8 rounded-full object-cover" />
-                    <span>{p["name"]}</span>
+                    <span class="truncate">{p["name"]}</span>
                 </div>
             </td>
             <td class="border px-2 py-1 text-center">{p["position"]}</td>
             <td class="border px-2 py-1 text-center">{p["nfl_team"]}</td>
             <td class="border px-2 py-1 text-center">{p["age"]}</td>
             <td class="border px-2 py-1 text-center">{exp}</td>
-            <td class="border px-2 py-1 text-center">{p["starts"]}</td>
             <td class="border px-2 py-1 text-center">{p["games_played"]}</td>
+            <td class="border px-2 py-1 text-center">{p["starts"]}</td>
             <td class="border px-2 py-1 text-center">{p["start_points"]}</td>
             <td class="border px-2 py-1 text-center">{p["ppgs"]}</td>
             <td class="border px-2 py-1 text-center">{p["total_points"]}</td>
