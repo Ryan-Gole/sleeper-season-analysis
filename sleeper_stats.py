@@ -56,7 +56,7 @@ def build_team_lookup(league_id):
         team_map[team_id] = user_id_to_name.get(owner_id, f"Team {team_id}")
     return team_map
 
-def get_all_team_matchups(league_id, team_map, weeks):
+def get_all_team_matchups(league_id, team_map, player_map, weeks):
     matchups_by_team = {team: [{}] * weeks for team in team_map.values()}
     for week in range(1, weeks + 1):
         match_id_to_teams_involved = {}
@@ -65,39 +65,93 @@ def get_all_team_matchups(league_id, team_map, weeks):
         for team in matchups:
             team_id = team_map.get(team['roster_id'], f"T{team['roster_id']}")
             matchup_id = team.get('matchup_id')
-            points_scored = team.get('points', 0)
             if matchup_id is not None:
-                match_id_to_teams_involved.setdefault(matchup_id, []).append((team_id, points_scored))
+                match_id_to_teams_involved.setdefault(matchup_id, []).append((team_id, team))
 
             
         for matchup in match_id_to_teams_involved.values():
             if len(matchup) == 2:
-                (team1, pts1), (team2, pts2) = matchup
-                matchups_by_team[team1][week-1] = {
-                    "opp": team2,
-                    "points_for": pts1,
-                    "points_against": pts2,
-                    "margin": pts1 - pts2,
-                    "result": 'W' if pts1 > pts2 else 'L' if pts1 < pts2 else 'D'
+                (team_one_id, team_one), (team_two_id, team_two) = matchup
+                team_one_points = team_one.get('points', 0)
+                team_two_points = team_two.get('points', 0)
+                team_one_max_points = calculate_max_points(team_one.get("players_points", {}), player_map)
+                team_two_max_points = calculate_max_points(team_two.get("players_points", {}), player_map)
+                matchups_by_team[team_one_id][week-1] = {
+                    "opp": team_two_id,
+                    "points_for": team_one_points,
+                    "points_against": team_two_points,
+                    "margin": team_one_points - team_two_points,
+                    "result": 'W' if team_one_points > team_two_points else 'L' if team_one_points < team_two_points else 'D',
+                    "max_points": team_one_max_points,
+                    "opp_max_points": team_two_max_points
                 }
-                matchups_by_team[team2][week-1] = {
-                    "opp": team1,
-                    "points_for": pts2,
-                    "points_against": pts1,
-                    "margin": pts2 - pts1,
-                    "result": 'W' if pts2 > pts1 else 'L' if pts2 < pts1 else 'D'
+                matchups_by_team[team_two_id][week-1] = {
+                    "opp": team_one_id,
+                    "points_for": team_two_points,
+                    "points_against": team_one_points,
+                    "margin": team_two_points - team_one_points,
+                    "result": 'W' if team_two_points > team_one_points else 'L' if team_two_points < team_one_points else 'D',
+                    "max_points": team_two_max_points,
+                    "opp_max_points": team_one_max_points
                 }
             else:
-                for team, _ in matchup:
+                for team, team_data in matchup:
                     matchups_by_team[team][week-1] = {
                         "opp": None,
                         "points_for": 0,
                         "points_against": 0,
                         "margin": 0,
-                        "result": None
+                        "result": None,
+                        "max_points": calculate_max_points(team_data.get("players_points", {}), player_map)
                     }
     return matchups_by_team
 
+def calculate_max_points(players_points, player_map):
+    lineup = {
+        "QB": [],
+        "RB": [],
+        "WR": [],
+        "TE": [],
+        "WR/RB/TE": [],
+        "WR/RB/TE/QB": []
+    }
+    limits = {
+        "QB": 1,
+        "RB": 2,
+        "WR": 3,
+        "TE": 1,
+        "WR/RB/TE": 2,
+        "WR/RB/TE/QB": 1
+    }
+    starter_limit = sum(limits.values())
+
+    sorted_players = sorted(
+        players_points.items(),
+        key=lambda x: x[1], # sort by points
+        reverse=True
+    )
+
+    total = 0.0
+    starter_count = 0
+    for player_id, points in sorted_players:
+        position = player_map.get(player_id, {}).get("position")
+        if not position:
+            continue
+
+        for slot in ["QB", "RB", "WR", "TE", "WR/RB/TE", "WR/RB/TE/QB"]:
+            if position not in slot:
+                continue
+            if len(lineup[slot]) >= limits[slot]:
+                continue
+            lineup[slot].append(player_id)
+            total += points
+            starter_count += 1
+            break
+
+        if starter_count == starter_limit:
+            break
+
+    return round(total, 2)
 
 def get_roster_stats(league_id, team_map, weeks, year):
     roster_stats_by_team = { 

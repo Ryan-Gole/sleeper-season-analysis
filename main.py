@@ -18,11 +18,11 @@ def load_content():
 def main():
     print("Fetching team data...")
     team_map = build_team_lookup(LEAGUE_ID)
-    matchups_by_team = get_all_team_matchups(LEAGUE_ID, team_map, WEEKS)
+    player_map = get_player_map()
+    matchups_by_team = get_all_team_matchups(LEAGUE_ID, team_map, player_map, WEEKS)
     season_stats = get_season_stats_by_team(matchups_by_team)
 
     starter_stats = get_roster_stats(LEAGUE_ID, team_map, WEEKS, YEAR)
-    player_map = get_player_map()
     enriched = enrich_starter_stats(starter_stats, player_map)
 
     content = load_content()

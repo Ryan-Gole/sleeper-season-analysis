@@ -200,6 +200,42 @@ def generate_matchup_tables(matchups_by_team):
                 color = 'text-yellow-400'
         return f'<td class="border px-2 py-1 {color} {bg}">{points}</td>'
     
+    def mpf_cell(team, week_idx, matchup):
+        mpf = matchup.get("max_points", 0)
+        opp = matchup.get("opp", "")
+        opp_mpf = matchup.get("opp_max_points", 0)
+        pair = tuple(sorted((team, opp)))
+        bg = matchup_colors_by_week[week_idx].get(pair, "")
+        color = ''
+        if isinstance(mpf, (int, float)) and isinstance(opp_mpf, (int, float)):
+            if mpf > opp_mpf:
+                color = 'text-green-400'
+            elif mpf < opp_mpf:
+                color = 'text-red-400'
+            else:
+                color = 'text-yellow-400'
+        return f'<td class="border px-2 py-1 {color} {bg}">{mpf}</td>'
+    
+    def lineup_efficiency_cell(team, week_idx, matchup):
+        points = matchup.get("points_for", 0)
+        mpf = matchup.get("max_points", 0)
+        eff = round((points/mpf) * 100, 2)
+        opp = matchup.get("opp", "")
+        opp_points = matchup.get("points_against", 0)
+        opp_mpf = matchup.get("opp_max_points", 0)
+        opp_eff = round((opp_points/opp_mpf) * 100, 2)
+        pair = tuple(sorted((team, opp)))
+        bg = matchup_colors_by_week[week_idx].get(pair, "")
+        color = ''
+        if isinstance(eff, (int, float)) and isinstance(opp_eff, (int, float)):
+            if eff > opp_eff:
+                color = 'text-green-400'
+            elif eff < opp_eff:
+                color = 'text-red-400'
+            else:
+                color = 'text-yellow-400'
+        return f'<td class="border px-2 py-1 {color} {bg}">{eff}%</td>'
+    
     html = [
         '<div class="w-screen px-4 -ml-4">',
         '<section class="overflow-x-auto px-2">'
@@ -209,8 +245,15 @@ def generate_matchup_tables(matchups_by_team):
     html.append(build_table("📈 Weekly Points Scored", points_cell))
     html.append('<p class="text-sm text-gray-400 mb-16">Background colors match teams that played each other that week.</p>')
     html.append(build_table("📉 Weekly Point Differentials", margin_cell))
-    html.append('<p class="text-sm text-gray-400 mb-16">Positive values indicate a win. Negative values indicate a loss. ' \
-    'Background colors match teams that played each other that week.</p>')
+    html.append('<p class="text-sm text-gray-400">Positive values indicate a win. Negative values indicate a loss.</p>')
+    html.append('<p class="text-sm text-gray-400 mb-16">Background colors match teams that played each other that week.</p>')
+    html.append(build_table("🧮 Weekly Max Points For", mpf_cell))
+    html.append('<p class="text-sm text-gray-400">Background colors match teams that played each other that week.</p>')
+    html.append('<p class="text-sm text-gray-400 mb-16">A green number indicates your MPF was greater than your opponent\'s MPF.</p>')
+    html.append(build_table("🧮 Weekly Lineup Efficiency", lineup_efficiency_cell))
+    html.append('<p class="text-sm text-gray-400">The percentage corresponds to the percent of your max points you achieved.</p>')
+    html.append('<p class="text-sm text-gray-400">Background colors match teams that played each other that week.</p>')
+    html.append('<p class="text-sm text-gray-400 mb-16">A green number indicates your efficiency was greater than your opponent\'s efficiency.</p>')
     html.append('</section></div>')
     return '\n'.join(html)
 
