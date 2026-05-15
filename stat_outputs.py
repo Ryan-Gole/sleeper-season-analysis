@@ -1,3 +1,6 @@
+from table_config import PointsTable, WLTable, MarginTable, MaxPointsTable, EfficiencyTable, PointsLeftTable
+
+
 def generate_html(matchups_by_team, season_stats, enriched_starters, writeups):
     sections = []
     sections.append(generate_head())
@@ -109,6 +112,30 @@ def generate_nav(writeups):
         </ul>
     </nav>'''
 
+def build_table(config, matchups_by_team, matchup_colors_by_week, weeks):
+    html = [f'<h2 class="text-xl font-bold mt-4 mb-4">{config.title}</h2>']
+    html.append('<table class="sortable table-auto border-collapse text-sm mb-4">')
+    html.append('<thead><tr>')
+    html.append('<th class="border px-2 py-1 text-left cursor-pointer hover:underline">Team <span class="sort-indicator"></span></th>')
+    for week in range(1, weeks + 1):
+        html.append(f'<th class="border px-2 py-1 cursor-pointer hover:underline">{week} <span class="sort-indicator"></span></th>')
+    html.append(f'<th class="border px-2 py-1 cursor-pointer hover:underline">{config.summary_header} <span class="sort-indicator"></span></th>')
+    html.append('</tr></thead><tbody>')
+
+    for team, matchups in matchups_by_team.items():
+        html.append(f'<tr><td class="border px-2 py-1">{team}</td>')
+        for week_idx, matchup in enumerate(matchups):
+            opp = matchup.get("opp", "")
+            pair = tuple(sorted((team, opp)))
+            bg = matchup_colors_by_week[week_idx].get(pair, "")
+            html.append(config.cell(team, week_idx, matchup, bg))
+        html.append(f'<td class="border px-2 py-1 text-center font-semibold">{config.summary(matchups)}</td>')
+        html.append('</tr>')
+
+    html.append('</tbody></table>')
+    for context in config.context:
+        html.append(f'<p class="text-sm text-gray-400">{context}</p>')
+    return '\n'.join(html)
 
 def generate_matchup_tables(matchups_by_team):
     weeks = len(next(iter(matchups_by_team.values())))
@@ -134,126 +161,14 @@ def generate_matchup_tables(matchups_by_team):
                 matchup_colors_by_week[week_idx][pair] = bg_classes[color_idx % len(bg_classes)]
                 color_idx += 1
 
-    def build_table(title, cell_func):
-        html = [f'<h2 class="text-xl font-bold mt-4 mb-4">{title}</h2>']
-        html.append('<table class="table-auto border-collapse text-sm mb-4">')
-        html.append('<thead><tr><th class="border px-2 py-1 text-left">Team</th>')
-        for week in range(1, weeks + 1):
-            html.append(f'<th class="border px-2 py-1">{week}</th>')
-        html.append('</tr></thead><tbody>')
-
-        for team, matchups in matchups_by_team.items():
-            html.append(f'<tr><td class="border px-2 py-1">{team}</td>')
-            for week_idx, matchup in enumerate(matchups):
-                html.append(cell_func(team, week_idx, matchup))
-            html.append('</tr>')
-
-        html.append('</tbody></table>')
-        return '\n'.join(html)
-
-    def wl_cell(team, week_idx, matchup):
-        result = matchup.get("result", "-")
-        opp = matchup.get("opp", "")
-        pair = tuple(sorted((team, opp)))
-        bg = matchup_colors_by_week[week_idx].get(pair, "")
-        color = {
-            'W': 'text-green-400',
-            'L': 'text-red-400',
-            'D': 'text-yellow-400',
-            '-': 'text-gray-400'
-        }.get(result, '')
-        return f'<td class="border px-2 py-1 {color} {bg}">{result}</td>'
-    
-    def margin_cell(team, week_idx, matchup):
-        margin = matchup.get("margin", 0)
-        opp = matchup.get("opp", "")
-        pair = tuple(sorted((team, opp)))
-        bg = matchup_colors_by_week[week_idx].get(pair, "")
-        if isinstance(margin, (int, float)):
-            if margin > 0:
-                color = 'text-green-400'
-                display = f"+{margin:.2f}"
-            elif margin < 0:
-                color = 'text-red-400'
-                display = f"{margin:.2f}"
-            else:
-                color = 'text-yellow-400'
-                display = "0.00"
-        else:
-            color = 'text-gray-400'
-            display = "-"
-        return f'<td class="border px-2 py-1 {color} {bg}">{display}</td>'
-
-    def points_cell(team, week_idx, matchup):
-        points = matchup.get("points_for", 0)
-        opp = matchup.get("opp", "")
-        opp_points = matchup.get("points_against", 0)
-        pair = tuple(sorted((team, opp)))
-        bg = matchup_colors_by_week[week_idx].get(pair, "")
-        color = ''
-        if isinstance(points, (int, float)) and isinstance(opp_points, (int, float)):
-            if points > opp_points:
-                color = 'text-green-400'
-            elif points < opp_points:
-                color = 'text-red-400'
-            else:
-                color = 'text-yellow-400'
-        return f'<td class="border px-2 py-1 {color} {bg}">{points}</td>'
-    
-    def mpf_cell(team, week_idx, matchup):
-        mpf = matchup.get("max_points", 0)
-        opp = matchup.get("opp", "")
-        opp_mpf = matchup.get("opp_max_points", 0)
-        pair = tuple(sorted((team, opp)))
-        bg = matchup_colors_by_week[week_idx].get(pair, "")
-        color = ''
-        if isinstance(mpf, (int, float)) and isinstance(opp_mpf, (int, float)):
-            if mpf > opp_mpf:
-                color = 'text-green-400'
-            elif mpf < opp_mpf:
-                color = 'text-red-400'
-            else:
-                color = 'text-yellow-400'
-        return f'<td class="border px-2 py-1 {color} {bg}">{mpf}</td>'
-    
-    def lineup_efficiency_cell(team, week_idx, matchup):
-        points = matchup.get("points_for", 0)
-        mpf = matchup.get("max_points", 0)
-        eff = round((points/mpf) * 100, 2)
-        opp = matchup.get("opp", "")
-        opp_points = matchup.get("points_against", 0)
-        opp_mpf = matchup.get("opp_max_points", 0)
-        opp_eff = round((opp_points/opp_mpf) * 100, 2)
-        pair = tuple(sorted((team, opp)))
-        bg = matchup_colors_by_week[week_idx].get(pair, "")
-        color = ''
-        if isinstance(eff, (int, float)) and isinstance(opp_eff, (int, float)):
-            if eff > opp_eff:
-                color = 'text-green-400'
-            elif eff < opp_eff:
-                color = 'text-red-400'
-            else:
-                color = 'text-yellow-400'
-        return f'<td class="border px-2 py-1 {color} {bg}">{eff}%</td>'
-    
-    html = [
-        '<div class="w-screen px-4 -ml-4">',
-        '<section class="overflow-x-auto px-2">'
+    tables = [
+        WLTable(), PointsTable(), MarginTable(), MaxPointsTable(), EfficiencyTable(), PointsLeftTable()
     ]
-    html.append(build_table("📊 Weekly Win/Loss Results", wl_cell))
-    html.append('<p class="text-sm text-gray-400 mb-16">Background colors match teams that played each other that week.</p>')
-    html.append(build_table("📈 Weekly Points Scored", points_cell))
-    html.append('<p class="text-sm text-gray-400 mb-16">Background colors match teams that played each other that week.</p>')
-    html.append(build_table("📉 Weekly Point Differentials", margin_cell))
-    html.append('<p class="text-sm text-gray-400">Positive values indicate a win. Negative values indicate a loss.</p>')
-    html.append('<p class="text-sm text-gray-400 mb-16">Background colors match teams that played each other that week.</p>')
-    html.append(build_table("🧮 Weekly Max Points For", mpf_cell))
-    html.append('<p class="text-sm text-gray-400">Background colors match teams that played each other that week.</p>')
-    html.append('<p class="text-sm text-gray-400 mb-16">A green number indicates your MPF was greater than your opponent\'s MPF.</p>')
-    html.append(build_table("🧮 Weekly Lineup Efficiency", lineup_efficiency_cell))
-    html.append('<p class="text-sm text-gray-400">The percentage corresponds to the percent of your max points you achieved.</p>')
-    html.append('<p class="text-sm text-gray-400">Background colors match teams that played each other that week.</p>')
-    html.append('<p class="text-sm text-gray-400 mb-16">A green number indicates your efficiency was greater than your opponent\'s efficiency.</p>')
+
+    html = ['<div class="w-screen px-4 -ml-4"><section class="overflow-x-auto px-2">']
+    for config in tables:
+        html.append(build_table(config, matchups_by_team, matchup_colors_by_week, weeks))
+        html.append('<p class="text-sm text-gray-400 mb-16">Background colors match teams that played each other that week.</p>')
     html.append('</section></div>')
     return '\n'.join(html)
 
