@@ -1,3 +1,115 @@
+def generate_html(matchups_by_team, season_stats, enriched_starters, writeups):
+    sections = []
+    sections.append(generate_head())
+    sections.append(generate_nav(writeups))
+    sections.append(generate_matchup_tables(matchups_by_team))
+    sections.append(generate_summary_tables(season_stats))
+    sections.append(generate_writeup_sections(writeups, enriched_starters))
+    sections.append(generate_footer())
+    
+    return f"""<!DOCTYPE html>
+<html lang="en">
+{chr(10).join(sections)}
+</html>"""
+
+def generate_head():
+    return '''<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decadent Dozen - Dynasty League 2025 Recap</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #e5e5e5;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll("table.sortable").forEach((table) => {
+                const headers = table.querySelectorAll("th");
+
+                headers.forEach((th, index) => {
+                    th.addEventListener("click", () => {
+                        const rows = Array.from(table.querySelectorAll("tbody tr"));
+                        const getValue = row => row.cells[index].innerText.trim();
+
+                        let sorted = rows.sort((a, b) => {
+                            const va = getValue(a), vb = getValue(b);
+                            const na = parseFloat(va), nb = parseFloat(vb);
+                            return isNaN(na) || isNaN(nb) ? va.localeCompare(vb) : na - nb;
+                        });
+
+                        const asc = !th.classList.contains("asc");
+
+                        // Reset all headers in this table
+                        headers.forEach(h => {
+                            h.classList.remove("asc", "desc");
+                            const icon = h.querySelector(".sort-indicator");
+                            if (icon) icon.textContent = "";
+                        });
+
+                        // Update clicked header
+                        th.classList.add(asc ? "asc" : "desc");
+                        const icon = th.querySelector(".sort-indicator");
+                        if (icon) icon.textContent = asc ? "▲" : "▼";
+
+                        if (!asc) sorted.reverse();
+
+                        // Highlight sorted column
+                        table.querySelectorAll("tbody tr").forEach(row => {
+                            row.querySelectorAll("td").forEach((td, i) => {
+                                td.classList.toggle("font-bold", i === index);
+                            });
+                        });
+
+                        sorted.forEach(row => table.querySelector("tbody").appendChild(row));
+                    });
+                });
+            });
+        });
+    </script>
+</head>'''
+
+def generate_footer():
+    return '''<script>
+        function toggleMore(button) {
+            const contentId = button.getAttribute('data-target');
+            const moreContent = document.getElementById(contentId);
+            moreContent.classList.toggle('hidden');
+            const isHidden = moreContent.classList.contains('hidden');
+            
+            document.querySelectorAll(`[data-target="${contentId}"]`).forEach(btn => {
+                btn.textContent = isHidden ? 'Show more' : 'Hide';
+            });
+        }
+    </script>
+</body>'''
+
+def generate_nav(writeups):
+    links = []
+    for section in writeups["sections"]:
+        for team in section["teams"]:
+            links.append(f'<li><a href="#{team["id"]}">{team["display"]}</a></li>\n')
+    
+    return f'''<body class="px-4 py-6 max-w-screen-md mx-auto">
+    <header class="text-center mb-6">
+        <h1 class="text-3xl font-bold">Decadent Dozen - 2025 Recap</h1>
+        <p class="text-gray-400">A look back at the season's stats and insights</p>
+    </header>
+    
+    <nav class="mb-6 sticky top-0 bg-[#1a1a1a] z-10 py-2 border-b border-gray-700">
+        <h2 class="font-semibold mb-2">Jump to Team</h2>
+        <ul class="flex flex-wrap gap-3 text-blue-400 text-sm">
+            {''.join(links)}
+        </ul>
+    </nav>'''
+
+
 def generate_matchup_tables(matchups_by_team):
     weeks = len(next(iter(matchups_by_team.values())))
 
@@ -102,9 +214,40 @@ def generate_matchup_tables(matchups_by_team):
     html.append('</section></div>')
     return '\n'.join(html)
 
+
+def generate_writeup_sections(writeups, enriched_starters):
+    html = []
+    for section in writeups["sections"]:
+        html.append(f'<h2 class="text-2xl font-bold mt-8 mb-4">{section["title"]}</h2>')
+        for team in section["teams"]:
+            html.append(generate_team_section(team, enriched_starters))
+    return '\n'.join(html)
+
+def generate_team_section(team, enriched_starters):
+    more_paragraphs = ''.join(f'<p>\n\t{p}\n</p>' for p in team["more"])
+    starter_table = generate_team_starter_table(
+        enriched_starters.get(team["sleeper_username"], [])
+    )
+    
+    return f'''<div>
+        <h3 class="text-xl font-semibold scroll-mt-28 md:scroll-mt-20" id="{team["id"]}">
+            {team["emoji"]} - @{team["sleeper_username"]} ({team["display"]}) - {team["team_name"]} - ({team["record"]})
+        </h3>
+        <div class="space-y-2 ml-6 mr-6 mt-2">
+            <p>{team["blurb"]}</p>
+            <div class="hidden more-content space-y-2" id="more-{team["id"]}">
+                {more_paragraphs}
+                <button class="text-blue-400 text-sm" data-target="more-{team["id"]}" onclick="toggleMore(this)">Show more</button>
+                {starter_table}
+            </div>
+            <button class="text-blue-400 text-sm" data-target="more-{team["id"]}" onclick="toggleMore(this)">Show more</button>
+        </div>
+    </div>'''
+
+
 def generate_team_starter_table(players):
     html = ['<div class="mt-6 pt-4 border-t border-gray-700">']
-    html.append('<h4 class="text-base font-semibold mb-3 text-gray-300">🏈 Starter Stats</h4>')
+    html.append('<h4 class="text-base font-semibold mb-3 text-gray-300">🏈 Player Stats</h4>')
     html.append('<table class="sortable table-auto border-collapse text-sm mb-2 w-full">')
     html.append('''<thead><tr>
         <th class="border px-2 py-1 text-left cursor-pointer hover:underline">Player <span class="sort-indicator"></span></th>

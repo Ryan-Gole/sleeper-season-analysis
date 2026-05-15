@@ -1,0 +1,211 @@
+{
+    "sections": [
+        {
+            "title": "🏅 The Winner's Circle",
+            "teams": [
+                {
+                    "id": "ryan-g",
+                    "sleeper_username": "ProfesorCaos",
+                    "display": "Ryan G",
+                    "team_name": "Team ProfesorCaos",
+                    "record": "11-3",
+                    "emoji": "🏆",
+                    "blurb": "A big congratulations to our champion Ryan G (that's me)!",
+                    "more": [
+                        "With an 11-3 record in the regular season, earning a BYE, I continued my winning ways with the postseason run.",
+                        "I was fortunate to face an easy schedule - tying for the lowest strength of schedule, against whom I scored the 2nd most points in the league.",
+                        "I also had the 3rd fewest points scored against me, and had the 5th best Luck Factor, which was still fairly positive despite 5th being near the middle of a 12 team league.",
+                        "The combination of elite skill position players - Ja'Maar Chase, Puka Nacua, and Trey McBride - all to go along with two top 8 QBs proved to be a potent roster.",
+                        "My largest margin of victory happened in week 5 against Gwen, scoring 186.24 to her 94.74. My largest loss was week 2 against Bryce, when I put up my lowest score of 117.62 versus his 164.94."
+                    ]
+                },
+                {
+                    "id": "ira",
+                    "sleeper_username": "RustySporxxx",
+                    "display": "Ira",
+                    "team_name": "Carradine Curtain Cords",
+                    "record": "10-4",
+                    "emoji": "🥈",
+                    "blurb": "A round of applause for our runner up, Ira! What a turnaround from having the worst record last year!",
+                    "more": [
+                        "Setting his lineup more consistently than the previous year helped, but the largest difference was having a dominant Christian McCaffrey healthy all year.",
+                        "A stellar year 3 breakout from Jaxon Smith-Njigba and George Pickens smashing on a new team also helped.",
+                        "Going from one of the hardest schedules last year with negative luck to one of the easiest ones this year (2nd fewest points against) and positive luck, helped en route to the 3rd best record in the regular season.",
+                        "Although Ira fell short of winning it all, he got to experience one of the highlights of the season with a 232.1 point performance in the semi-finals against the higher seeded Conor, the highest score in a single week across both years of the league.",
+                        "While that semi-final performance was a huge victory, Ira's largest win happened against Ryan W. in week 9 when he scored 196.82 to Ryan's 88.04. Ira's biggest loss was in week 8, putting up 132.08 points to my 182.34."
+                    ]
+                },
+                {
+                    "id": "bryce",
+                    "sleeper_username": "jazzyjackalope",
+                    "display": "Bryce",
+                    "team_name": "Mormen less problems",
+                    "record": "8-6",
+                    "emoji": "🥉",
+                    "blurb": "And Bryce gets the bronze!",
+                    "more": [
+                        "While the 8-6 finish wasn't the most impressive regular season record after an incredible 7-1 start, it was good enough to make the playoffs where dominant performances in the first and final rounds resulted in 3rd place.",
+                        "Bryce's 217.8 points in the first round of the playoffs was the second most points scored by any team this year. That high scoring potential was consistent throughout the season, as Bryce had the most points scored this year of any team.",
+                        "Remarkably, this is the second year in a row where Bryce has had the worst \"luck factor\" score, which calculates how much opponents scored against him versus their average weekly scores. Perhaps that contributed to the 5 game losing streak in the second half of the season.",
+                        "While the strength of schedule was actually quite average, the opponents being so lucky against Bryce resulted in having the most points against as well.",
+                        "The biggest win for Bryce happened in week 7, outscoring Gabe 191.4 to 117.02. Bryce's biggest loss surprisingly happened against Sera, who outscored him 182.00 to 140.2."
+                    ]
+                }
+            ]
+        },
+        {
+            "title": "🎉 The Honorable Mentions",
+            "teams": [
+                {
+                    "id": "conor",
+                    "sleeper_username": "TwiceMarked",
+                    "display": "Conor",
+                    "team_name": "The Wright Stuff",
+                    "record": "11-3",
+                    "emoji": "✨",
+                    "blurb": "Conor finished the regular season with the 2nd strongest record at 11-3, and took the 4th place finish in the playoffs.",
+                    "more": [
+                        "For the second year in a row, the team with the 2nd best regular season record missed the podium in the playoffs.",
+                        "Conor had a breeze of a regular season, tying for the best record against the easiest schedule both in terms of strength of schedule and points against (with the highest positive luck factor).",
+                        "Unfortunately, variance caught up with Conor in the playoffs, as he faced the highest score ever in this league in the semi-finals, followed by his team underperforming expectations by a wide margin in the 3rd place matchup.",
+                        "There were some large victories for Conor this season, the biggest of which was in week 5 against his own wife, scoring 185.02 against Chelsea's measly 72.46, the largest margin of victory all season. Conor's greatest loss came at an unfortunate time, putting up 135.58 in the semifinals against Ira's whopping 232.1 points (the most points a team has scored).",
+                        "Conor also managed to play in both of the closest contests this year, in weeks 6 and 7, winning both by a combined margin of less than 3.",
+                        "Conor's season also had a noteworthy 9 (JJM 😭) game winning streak."
+                    ]
+                },
+                {
+                    "id": "josh",
+                    "sleeper_username": "yoahiwa",
+                    "display": "Josh",
+                    "team_name": "Joshi",
+                    "record": "9-5",
+                    "emoji": "💪",
+                    "blurb": "Josh ends up in the Honorable Mentions section for the second year in a row, though this time with a better record.",
+                    "more": [
+                        "Josh faced a slightly easier schedule this year from last year, and had better luck, although it was still slightly negative.",
+                        "A 4 game win streak to close out the season helped propel Josh from 5-5 into that 9-5 finish for the 4th best record.",
+                        "The 2146.66 points Josh's team scored this season was good for 3rd best in the league.",
+                        "Garrett Wilson's unfortunate injury put a damper on the season, but Amon-Ra continued to be a great WR, and Stafford and Dak added very strong QB performances.",
+                        "Josh had two massive victories this past season, both with just under 90 point margins. In week 5 it was 163.04 to Sera's 73.78, and in week 12 167.08 over Connor's 77.86. Josh's largest defeat came with unfortunate timing, in week 1 of the playoffs, losing to Bryce's massive 217.18 point total while still putting up a very respectable 176.78."
+                    ]
+                }
+            ]
+        },
+        {
+            "title": "⚖️ Those Who Were Mid",
+            "teams": [
+                {
+                    "id": "abe",
+                    "sleeper_username": "SgtWeenieArms",
+                    "display": "Abe",
+                    "team_name": "Team SgtWeenieArms",
+                    "record": "7-7",
+                    "emoji": "😐",
+                    "blurb": "Although Abe made the playoffs as the 6th seed, there was a steep drop off after the 5th seed.",
+                    "more": [
+                        "Abe's season was incredibly streaky. A 3-1 start was followed by a 3 game losing streak, then a 4 game winning streak, and a 3 game losing streak to close the season 7-7.",
+                        "Despite playing basically the most average schedule possible, Abe's opponents excelled against him, resulting in Abe having the 2nd most points against and the 2nd most negative luck factor.",
+                        "The biggest win for Abe this season was in week 3 over Gabe, putting up 170.12 points to Gabe's 128.04. Ironically, Abe's largest loss was also against Gabe, in week 14, scoring just 109.6 to Gabe's 180.06.",
+                        "Josh Allen performed strong as always, the QB1 in fantasy yet again, and Justin Herbert had a good year. Outside of the quarterback room, other performances were less impressive."
+                    ]
+                },
+                {
+                    "id": "gwen",
+                    "sleeper_username": "dontwearsandals",
+                    "display": "Gwen",
+                    "team_name": "No Rubidium",
+                    "record": "7-7",
+                    "emoji": "0️⃣🇷🇧",
+                    "blurb": "Gwen's 7-7 finish, almost making the playoffs, is an impressive feat for a team that declined to roster any real running backs.",
+                    "more": [
+                        "Gwen faced an average strength of schedule and had pretty good luck, 2nd best in the league.",
+                        "In part due to this luck, Gwen managed to go 7-7 despite being outscored by her opponents by over 150 points. Although her Points For was 3rd worst in the league, facing the 4th lowest Points Against helped eke out enough victories for an even record.",
+                        "The team continues to look very strong, especially in the Tight End room, as Tyler Warren had a great season to join Brock Bowers.",
+                        "Gwen's worst loss of the season happened in week 5 to Ryan G., putting up 94.74 points against 186.24, followed by her largest victory the following week over Connor - 138.2 points to his 90.42.",
+                        "Team management might look to add some running backs to the roster to improve the outcome next year."
+                    ]
+                },
+                {
+                    "id": "connor",
+                    "sleeper_username": "CeeLoGreen97",
+                    "display": "Connor",
+                    "team_name": "I Got a Thielen",
+                    "record": "6-8",
+                    "emoji": "👴",
+                    "blurb": "The defending champion saw a fall from the heights of last year, suffering a 2-7 record in the final 9 weeks of the season.",
+                    "more": [
+                        "The team that was by far the oldest roster saw father time remain undefeated, as age wore on the players and the roster grew thin.",
+                        "Connor also faced a tougher schedule than last year and caught a bit of negative variance in opponents scoring more against him than they did against other teams.",
+                        "While the team could use a bit of re-tooling, the off-season offers plenty of opportunities to trade the veterans on the team for younger players or picks.",
+                        "Connor's largest loss was in week 12 against Josh, scoring just 77.86 to Josh's 167.08, while his largest victory was in week 2 against Chelsea, winning soundly 149.3 to 94.44."
+                    ]
+                },
+                {
+                    "id": "ryan-w",
+                    "sleeper_username": "rynoceros17",
+                    "display": "Ryan W",
+                    "team_name": "Lumon & Friends",
+                    "record": "5-9",
+                    "emoji": "🤕",
+                    "blurb": "It was a season marred by injury for Ryan, as Malik Nabers and Bucky Irving, two of his best players, both missed most of the season.",
+                    "more": [
+                        "Despite the injury woes, Ryan managed to put up a good effort, starting 4-4, until a 1-5 record in the final 6 games put the nail in the coffin.",
+                        "On top of the injury woes, Ryan also had the unfortunate of facing the 4th highest strength of schedule in the league.",
+                        "Ryan's biggest win and his biggest loss happened in back to back weeks. In week 8, Ryan absolutely crushed Chelsea, 156.76 to 66.72, only to have the favor returned the following week as Ira dropped 196.82 points against Ryan's 88.04.",
+                        "Perhaps things are looking up for next year, as Tetairoa McMillan had a great rookie season and Olave had a career year. Hopefully his players will come back healthy in the new season."
+                    ]
+                }
+            ]
+        },
+        {
+            "title": "🪦",
+            "teams": [
+                {
+                    "id": "sera",
+                    "sleeper_username": "PrincessofRaven",
+                    "display": "Sera",
+                    "team_name": "The Never Ending Light",
+                    "record": "4-10",
+                    "emoji": "😬",
+                    "blurb": "As a team that was trying to tank this year, Sera was never a contender but still managed to win 4 games.",
+                    "more": [
+                        "Despite starting the season with a 5 game losing streak, Sera won 3 of the 4 next games as she got to face the easy part of her schedule (Chelsea, Gwen, and Gabe).",
+                        "Despite scoring the 2nd fewest points this year by a fairly wide margin over 3rd fewest, Sera managed to win 4 games anyway, possibly due to having the 3rd easiest schedule this year.",
+                        "While not as lucky as last year, she also managed to have the 3rd best Luck Factor in league, as opponents put up fewer points against her than they did against other teams.",
+                        "Sera was one of many teams who had their largest loss at the hands of Ira - in week 7 being outscored 79.2 to 170.74. She also was one of many teams who had their greatest victory over Chelsea - just the week prior - winning 119.46 to 75.08."
+                    ]
+                },
+                {
+                    "id": "gabe",
+                    "sleeper_username": "EmpiricalFool",
+                    "display": "Gabe",
+                    "team_name": "Never Gonna Gibb You Up",
+                    "record": "3-11",
+                    "emoji": "💀",
+                    "blurb": "Although Gabe's record was tied for last place, the team had the potential for better.",
+                    "more": [
+                        "Gabe faced some of the toughest circumstances of any team this season. He was tied for the hardest strength of schedule, had the 3rd most points scored against him, and had the 3rd worst Luck Factor.",
+                        "Although Gabe lost many games, he still had a huge win to his name in week 14 against Abe (a playoff team) by a massive margin of 180.06 to 109.6. Gabe's worst loss was week 8 to Bryce, who put up 191.4 to Gabe's 117.02.",
+                        "It was a rough start to the season for Gabe's team, starting with a 6 game losing streak, with an additional 4 game losing streak shortly after.",
+                        "Gabe's team remains one of the youngest in the league with potentially a bright future ahead, headlined by Jahmyr Gibbs and supported by a youthful wide receiver room."
+                    ]
+                },
+                {
+                    "id": "chelsea",
+                    "sleeper_username": "Chello1995",
+                    "display": "Chelsea",
+                    "team_name": "The Spooky Girls 👻",
+                    "record": "3-11",
+                    "emoji": "💩",
+                    "blurb": "Finally, the worst record on the season after the tiebreaker of Points For was claimed by Chelsea.",
+                    "more": [
+                        "Chelsea suffered a season destroyed by injuries to both of her starting quarterbacks by the second week of the season who missed a combined 17.7 games.",
+                        "Tying Gabe for strongest Strength of Schedule, Chelsea also faced the 4th most points scored against her, so even if her QBs had remained healthy, it might've been a struggle.",
+                        "The nine game losing streak to start the season was disheartening. I'll be honest - I wasn't sure Chelsea would win any games, but things improved when her QBs came back healthy, and she won 3 of her final 5 regular season games.",
+                        "The biggest loss of Chelsea's season had the largest point differential any team faced this season, 185.02 to 72.46 against Conor in week 5. Chelsea did get to enjoy some victories though, the largest being in week 16 against Sera - 164.16 to 95.12."
+                    ]
+                }
+            ]
+        }
+    ]
+}

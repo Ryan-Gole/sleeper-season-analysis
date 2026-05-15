@@ -1,28 +1,36 @@
+import json
+
 import pandas as pd
 from tabulate import tabulate
 from sleeper_stats import build_team_lookup, get_all_team_matchups, get_season_stats_by_team, get_roster_stats, enrich_starter_stats, get_player_map
-from stat_outputs import generate_matchup_tables, generate_summary_tables, inject_overview_tables, inject_starter_tables
+from stat_outputs import generate_html
 
 LEAGUE_ID = "1225658606028865536"
 YEAR = 2025
 WEEKS = 14
 HTML_PATH = "web/index.html"
+CONTENT_PATH = "content.json"
+
+def load_content():
+    with open(CONTENT_PATH, 'r', encoding='utf-8') as f:
+        return json.load(f)
 
 def main():
     print("Fetching team data...")
     team_map = build_team_lookup(LEAGUE_ID)
     matchups_by_team = get_all_team_matchups(LEAGUE_ID, team_map, WEEKS)
     season_stats = get_season_stats_by_team(matchups_by_team)
-    
-    html = [generate_matchup_tables(matchups_by_team)]
-    html.append(generate_summary_tables(season_stats))
-    inject_overview_tables(HTML_PATH, '\n'.join(html))
 
     starter_stats = get_roster_stats(LEAGUE_ID, team_map, WEEKS, YEAR)
     player_map = get_player_map()
     enriched = enrich_starter_stats(starter_stats, player_map)
-    inject_starter_tables(HTML_PATH, enriched)
 
+    content = load_content()
+
+    html = generate_html(matchups_by_team, season_stats, enriched, content)
+    
+    with open(HTML_PATH, 'w', encoding='utf-8') as f:
+        f.write(html)
 
     # df_stats = pd.DataFrame(season_stats).T
     # df_stats = df_stats.sort_values(by="wins", ascending=False)
